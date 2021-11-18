@@ -1,3 +1,3 @@
 #!/bin/sh
 
-go run client.go
+go run src/client/client.go
