@@ -1,0 +1,124 @@
+syntax = "proto3";
+package v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+option go_package = "pkg/api";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+	info: {
+		title: "ToDo service";
+		version: "1.0";
+		contact: {
+			name: "go-grpc-rest project";
+			url: "https://github.com/hi-space/go-grpc-rest";
+			email: "hispace.j@gmail.com";
+        };
+    };
+    schemes: HTTP;
+    consumes: "application/json";
+    produces: "application/json";
+    responses: {
+		key: "404";
+		value: {
+			description: "Returned when the resource does not exist.";
+			schema: {
+				json_schema: {
+					type: STRING;
+				}
+			}
+		}
+	}
+};
+
+service ToDoService {
+    rpc Create(CreateRequest) returns (CreateResponse) {
+        option (google.api.http) = {
+            post: "/v1/todo"
+            body: "*"
+        };
+    }
+
+    rpc Read(ReadRequest) returns (ReadResponse) {
+        option (google.api.http) = {
+            get: "/v1/todo/{id}"
+        };
+    }
+
+    rpc Update(UpdateRequest) returns (UpdateResponse) {
+        option (google.api.http) = {
+            put: "/v1/todo/{toDo.id}"
+            body: "*"
+        };
+    }
+
+    rpc Delete(DeleteRequest) returns (DeleteResponse) {
+        option (google.api.http) = {
+            delete: "/v1/todo/{id}"
+        };
+    }
+
+    rpc ReadAll(ReadAllRequest) returns (ReadAllResponse) {
+        option (google.api.http) = {
+            get: "/v1/todo/all"
+        };
+    }
+}
+
+message ToDo {
+    string id = 1;
+    string title = 2;
+    string description = 3;
+    google.protobuf.Timestamp reminder = 4;
+}
+
+message CreateRequest{
+    string api = 1;
+    ToDo toDo = 2;
+}
+
+message CreateResponse{
+    string api = 1;
+    string id = 2;
+}
+
+message ReadRequest{
+    string api = 1;
+    string id = 2;
+}
+
+message ReadResponse{
+    string api = 1;
+    ToDo toDo = 2;
+}
+
+message UpdateRequest{
+    string api = 1;
+    ToDo toDo = 2;
+}
+
+message UpdateResponse{
+    string api = 1;
+    ToDo updated = 2;
+}
+
+message DeleteRequest{
+    string api = 1;
+    string id = 2;
+}
+
+message DeleteResponse{
+    string api = 1;
+    string deleted = 2;
+}
+
+message ReadAllRequest{
+    string api = 1;
+}
+
+message ReadAllResponse{
+    string api = 1;
+    repeated ToDo toDos = 2;
+}
