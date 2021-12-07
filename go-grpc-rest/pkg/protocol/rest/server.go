@@ -14,13 +14,17 @@ import (
 	v1 "go-grpc-rest/pkg/api"
 )
 
+func serveSwagger(w http.ResponseWriter, r *http.Request) {
+	log.Println("serverSwagger")
+	http.ServeFile(w, r, "go-grpc-rest/api/swagger/todo.swagger.json")
+}
+
 // RunServer runs HTTP/REST gateway
 func RunServer(ctx context.Context, grpcPort, httpPort string) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	mux := runtime.NewServeMux()
-	// opts := []grpc.DialOption{grpc.WithInsecure()}
+	rmux := runtime.NewServeMux()
 
 	conn, err := grpc.DialContext(
 		context.Background(),
@@ -33,14 +37,21 @@ func RunServer(ctx context.Context, grpcPort, httpPort string) error {
 		log.Fatalln("Failed to dial server:", err)
 	}
 
-	if err := v1.RegisterToDoServiceHandler(ctx, mux, conn); err != nil {
+	if err := v1.RegisterToDoServiceHandler(ctx, rmux, conn); err != nil {
 		log.Fatalf("failed to start HTTP gateway: %v", err)
 	}
 
 	srv := &http.Server{
 		Addr:    ":" + httpPort,
-		Handler: mux,
+		Handler: rmux,
 	}
+
+	// Serve the swagger-ui and swagger file
+	// mux := http.NewServeMux()
+	// mux.Handle("/", rmux)
+	// mux.HandleFunc("/swagger.json", serveSwagger)
+	// fs := http.FileServer(http.Dir("www/swagger-ui"))
+	// mux.Handle("/swagger-ui", http.StripPrefix("/swagger-ui", fs))
 
 	// graceful shutdown
 	c := make(chan os.Signal, 1)

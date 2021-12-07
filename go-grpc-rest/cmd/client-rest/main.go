@@ -96,7 +96,7 @@ func main() {
 	log.Printf("Update response: Code=%d, Body=%s\n\n", resp.StatusCode, body)
 
 	// Call ReadAll
-	resp, err = http.Get(*address + "/v1/todo/all")
+	resp, err = http.Get(*address + "/v1/todo")
 	if err != nil {
 		log.Fatalf("failed to call ReadAll method: %v", err)
 	}

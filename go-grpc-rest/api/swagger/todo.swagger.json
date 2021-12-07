@@ -20,6 +20,41 @@
   ],
   "paths": {
     "/v1/todo": {
+      "get": {
+        "operationId": "ToDoService_ReadAll",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ReadAllResponse"
+            }
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "api",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ToDoService"
+        ]
+      },
       "post": {
         "operationId": "ToDoService_Create",
         "responses": {
@@ -51,43 +86,6 @@
             "schema": {
               "$ref": "#/definitions/v1CreateRequest"
             }
-          }
-        ],
-        "tags": [
-          "ToDoService"
-        ]
-      }
-    },
-    "/v1/todo/all": {
-      "get": {
-        "operationId": "ToDoService_ReadAll",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1ReadAllResponse"
-            }
-          },
-          "404": {
-            "description": "Returned when the resource does not exist.",
-            "schema": {
-              "type": "string",
-              "format": "string"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "api",
-            "in": "query",
-            "required": false,
-            "type": "string"
           }
         ],
         "tags": [

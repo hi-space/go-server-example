@@ -62,7 +62,7 @@ service ToDoService {
 
     rpc ReadAll(ReadAllRequest) returns (ReadAllResponse) {
         option (google.api.http) = {
-            get: "/v1/todo/all"
+            get: "/v1/todo"
         };
     }
 }

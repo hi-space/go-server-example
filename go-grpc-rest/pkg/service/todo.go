@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"fmt"
+	"log"
 
 	v1 "go-grpc-rest/pkg/api"
 
@@ -55,6 +56,8 @@ func (s *toDoServiceServer) Create(ctx context.Context, req *v1.CreateRequest) (
 	if err := s.checkAPI(req.Api); err != nil {
 		return nil, err
 	}
+
+	log.Println(req)
 
 	c := s.GetTodoCollection(ctx)
 
