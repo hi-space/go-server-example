@@ -21,7 +21,7 @@ func main() {
 		wshandler(c.Writer, c.Request)
 	})
 
-	r.Run("localhost:12312")
+	r.Run("localhost:8080")
 }
 
 var wsupgrader = websocket.Upgrader{
@@ -39,6 +39,9 @@ func wshandler(w http.ResponseWriter, r *http.Request) {
 
 	for {
 		t, msg, err := conn.ReadMessage()
+
+		fmt.Println(t, string(msg))
+
 		if err != nil {
 			break
 		}
