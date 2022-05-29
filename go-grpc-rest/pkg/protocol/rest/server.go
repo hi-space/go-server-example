@@ -6,9 +6,12 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path"
+	"strings"
 	"time"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+
 	"google.golang.org/grpc"
 
 	v1 "go-grpc-rest/pkg/api"
@@ -41,17 +44,20 @@ func RunServer(ctx context.Context, grpcPort, httpPort string) error {
 		log.Fatalf("failed to start HTTP gateway: %v", err)
 	}
 
-	srv := &http.Server{
-		Addr:    ":" + httpPort,
-		Handler: rmux,
-	}
-
 	// Serve the swagger-ui and swagger file
-	// mux := http.NewServeMux()
-	// mux.Handle("/", rmux)
-	// mux.HandleFunc("/swagger.json", serveSwagger)
+	mux := http.NewServeMux()
+	mux.Handle("/", rmux)
+	mux.HandleFunc("/swagger/", serveSwaggerFile)
+	serveSwaggerUI(mux)
+
+	// mux.HandleFunc("/swagger.json", serveSwaggerFile)
 	// fs := http.FileServer(http.Dir("www/swagger-ui"))
 	// mux.Handle("/swagger-ui", http.StripPrefix("/swagger-ui", fs))
+
+	srv := &http.Server{
+		Addr:    ":" + httpPort,
+		Handler: mux,
+	}
 
 	// graceful shutdown
 	c := make(chan os.Signal, 1)
@@ -69,4 +75,28 @@ func RunServer(ctx context.Context, grpcPort, httpPort string) error {
 
 	log.Println("starting HTTP/REST gateway...")
 	return srv.ListenAndServe()
+}
+
+func serveSwaggerFile(w http.ResponseWriter, r *http.Request) {
+	log.Println("start serveSwaggerFile")
+
+	if !strings.HasSuffix(r.URL.Path, "swagger.json") {
+		log.Printf("Not Found: %s", r.URL.Path)
+		http.NotFound(w, r)
+		return
+	}
+
+	p := strings.TrimPrefix(r.URL.Path, "/swagger/")
+	p = path.Join("api/swagger", p)
+
+	log.Printf("Serving swagger-file: %s", p)
+
+	http.ServeFile(w, r, p)
+}
+
+func serveSwaggerUI(mux *http.ServeMux) {
+	fileServer := http.FileServer(http.Dir("www/swagger-ui"))
+	prefix := "/swagger-ui/"
+
+	mux.Handle(prefix, http.StripPrefix(prefix, fileServer))
 }
